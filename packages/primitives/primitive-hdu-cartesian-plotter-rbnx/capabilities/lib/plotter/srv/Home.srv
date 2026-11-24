@@ -1,7 +1,0 @@
-# Execute the PLC homing routine (MC_GroupHome) and block until it
-# reports completion. The PLC homes the axes group to its internal
-# Home array, which is fixed at (0, 0, 0); no target is accepted here.
----
-bool    success
-string  message
-float64 elapsed_s

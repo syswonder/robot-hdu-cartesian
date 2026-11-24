@@ -1,8 +1,0 @@
-[contract]
-id      = "robonix/primitive/plotter/driver"
-version = "1"
-kind    = "primitive"
-idl     = "lifecycle/srv/Driver.srv"
-
-[mode]
-type = "rpc"

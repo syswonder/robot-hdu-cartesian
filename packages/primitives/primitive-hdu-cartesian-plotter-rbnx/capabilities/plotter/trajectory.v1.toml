@@ -1,8 +1,0 @@
-[contract]
-id      = "robonix/primitive/plotter/trajectory"
-version = "1"
-kind    = "primitive"
-idl     = "plotter/srv/Trajectory.srv"
-
-[mode]
-type = "rpc"

@@ -1,8 +1,0 @@
-[contract]
-id      = "robonix/primitive/plotter/set_params"
-version = "1"
-kind    = "primitive"
-idl     = "plotter/srv/SetParams.srv"
-
-[mode]
-type = "rpc"

@@ -1,8 +1,0 @@
-[contract]
-id      = "robonix/primitive/plotter/status"
-version = "1"
-kind    = "primitive"
-idl     = "plotter/msg/PlotterStatus.msg"
-
-[mode]
-type = "topic_out"

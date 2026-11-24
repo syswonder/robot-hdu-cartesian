@@ -6,7 +6,7 @@ sheet with a single pen. It has no chassis, no arm joints, no camera, and no
 autonomous motion: an external PLC owns interpolation, limits, and the
 emergency stop, while Robonix only sends validated millimetre waypoints.
 
-Catalog name: `robonix.robot.hdu.cartesian`.
+![alt text](assets/robot.png)
 
 ## Hardware
 

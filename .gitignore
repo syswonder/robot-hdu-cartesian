@@ -3,6 +3,7 @@ rbnx-build/
 rbnx-boot/
 logs/
 images/
+packages/
 __pycache__/
 *.py[cod]
 *.egg-info/

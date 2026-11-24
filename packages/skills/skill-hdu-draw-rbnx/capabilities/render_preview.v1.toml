@@ -1,8 +1,0 @@
-[contract]
-id      = "robonix/skill/plot/render_preview"
-version = "1"
-kind    = "skill"
-idl     = "plot/srv/GenerateImage.srv"
-
-[mode]
-type = "rpc"

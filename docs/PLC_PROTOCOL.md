@@ -1,7 +1,7 @@
 # PLC TCP Protocol
 
-> **Authority.** The authoritative protocol specification is
-> [`SDK/docs/protocol.md`](../SDK/docs/protocol.md). This document is the
+> **Authority.** The authoritative protocol specification lives in the PLC-side
+> repository (https://github.com/HDU-FROST/PLC-cartesian). This document is the
 > Robonix-side summary used to review the primitive implementation; field-level
 > PLC state machines and packet captures remain in the SDK documentation.
 >

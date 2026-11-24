@@ -32,13 +32,29 @@ config:
   units: mm
 
   # float mm, default: -46.0. Pen-up height (4 mm above the paper).
-  # Must satisfy -50 <= z_down < z_up <= 0; z is encoded in every
+  # Must satisfy z_min <= z_down < z_up <= z_max; z is encoded in every
   # waypoint, so the PLC does not use its own z_up/z_down for motion.
   z_up: -46.0
 
   # float mm, default: -50.0. Pen-down height (pen tip on the paper).
   # Machine-specific: verify it by hand before the first run.
   z_down: -50.0
+
+  # float mm, default: -50.0. Lower Z travel limit used to validate pen
+  # heights. Machine-specific: override for other rigs.
+  z_min: -50.0
+
+  # float mm, default: 0.0. Upper Z travel limit used to validate pen
+  # heights. Machine-specific: override for other rigs.
+  z_max: 0.0
+
+  # float mm, default: 180.0. Drawable area width in the paper frame
+  # (origin (0,0) at the paper corner; the x minimum is always 0).
+  # Reported to skills via PlotterStatus; override for other rigs.
+  area_x_max: 180.0
+
+  # float mm, default: 150.0. Drawable area height (y minimum always 0).
+  area_y_max: 150.0
 
   # Global motion profile, sent with CMD_SET_PARAM (6 x f32) on connect
   # and on every set_params call. The PLC has no per-point profile.

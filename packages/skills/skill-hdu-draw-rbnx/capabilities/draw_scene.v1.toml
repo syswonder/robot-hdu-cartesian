@@ -1,8 +1,0 @@
-[contract]
-id      = "robonix/skill/plot/draw_scene"
-version = "1"
-kind    = "skill"
-idl     = "plot/srv/DrawScene.srv"
-
-[mode]
-type = "rpc"

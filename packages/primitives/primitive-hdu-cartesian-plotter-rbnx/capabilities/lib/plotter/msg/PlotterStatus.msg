@@ -12,6 +12,11 @@ float64 z
 float64 z_up
 float64 z_down
 
+# Drawable area in machine mm. The paper corner is the origin (0,0),
+# so x/y minima are always 0 and only the maxima are reported.
+float64 area_x_max
+float64 area_y_max
+
 # IDLE | MOVING | HOMING | ERROR | DISCONNECTED
 string state
 # Monotonic counter for this stream.

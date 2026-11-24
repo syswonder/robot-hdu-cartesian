@@ -43,6 +43,7 @@ robot:
             - { path: robonix/primitive/plotter/home, description: "Send the gantry to machine zero (MCP plotter_home)." }
             - { path: robonix/primitive/plotter/set_params, description: "Set pen heights and the global motion profile (MCP plotter_set_params)." }
             - { path: robonix/primitive/plotter/status, description: "Synthesized connection/busy/position status stream." }
+            - { path: robonix/primitive/plotter/geometry, description: "Static drawable area and pen heights, read once by skills on activation." }
     - id: pen
       type: end_effector
       urdf_link: z_carriage
@@ -59,6 +60,7 @@ robot:
 
 description:
   summary: >
+    HDU桌面型三轴直角坐标（XYZ）龙门写字机（HDU = Hangzhou Dianzi University，杭州电子科技大学）
     桌面型三轴直角坐标（XYZ）龙门写字机。X/Y 两轴在 180 mm × 150 mm 的纸面内移动笔尖，
     Z 轴只在 -46 mm（抬笔）到 -50 mm（落笔）之间升降；机器零点 (0,0,0) 位于纸张
     左下角上方 50 mm。没有底盘、没有轮子、没有多关节机械臂；全部运动由外部 PLC

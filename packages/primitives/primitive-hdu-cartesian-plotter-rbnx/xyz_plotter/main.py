@@ -61,6 +61,12 @@ _DEFAULTS = {
     # Pen heights in the paper frame: paper surface z=-50, pen up z=-46.
     "z_up": -46.0,
     "z_down": -50.0,
+    # Drawable area in the paper frame: origin (0,0), +X right, +Y up.
+    "area_x_max": 180.0,
+    "area_y_max": 150.0,
+    # Z travel limits used for validation; other machines override these.
+    "z_min": -50.0,
+    "z_max": 0.0,
     # Global motion profile (PLC SET_PARAM values).
     "velocity": 20.0,
     "acceleration": 300.0,
@@ -135,12 +141,22 @@ def _merge_config(raw: dict) -> dict:
     cfg["z_down"] = _as_float(raw, "z_down", cfg["z_down"])
     if cfg["z_up"] <= cfg["z_down"]:
         raise ValueError(f"z_up ({cfg['z_up']}) must be greater than z_down ({cfg['z_down']})")
-    # Machine limits from the SDK/URDF: paper surface -50, top of travel 0.
-    if not (-50.0 <= cfg["z_down"] < cfg["z_up"] <= 0.0):
+
+    # Z travel limits — machine-specific; override via config for other rigs.
+    cfg["z_min"] = _as_float(raw, "z_min", cfg["z_min"])
+    cfg["z_max"] = _as_float(raw, "z_max", cfg["z_max"])
+    if cfg["z_max"] <= cfg["z_min"]:
+        raise ValueError(f"z_max ({cfg['z_max']}) must be greater than z_min ({cfg['z_min']})")
+    if not (cfg["z_min"] <= cfg["z_down"] < cfg["z_up"] <= cfg["z_max"]):
         raise ValueError(
-            "pen heights must satisfy -50 <= z_down < z_up <= 0, got "
-            f"z_down={cfg['z_down']}, z_up={cfg['z_up']}"
+            "pen heights must satisfy z_min <= z_down < z_up <= z_max, got "
+            f"z_min={cfg['z_min']}, z_down={cfg['z_down']}, "
+            f"z_up={cfg['z_up']}, z_max={cfg['z_max']}"
         )
+
+    # Drawable area in the paper frame; x/y minima are fixed at 0.
+    cfg["area_x_max"] = _as_float(raw, "area_x_max", cfg["area_x_max"], minimum=0.0)
+    cfg["area_y_max"] = _as_float(raw, "area_y_max", cfg["area_y_max"], minimum=0.0)
 
     for key in ("velocity", "acceleration", "deceleration", "jerk"):
         cfg[key] = _as_float(raw, key, cfg[key], minimum=0.1)
@@ -470,10 +486,11 @@ def _set_params_impl(req) -> tuple[bool, str]:
             return False, "params must be finite"
         values[key] = float(cfg[key]) if raw == 0.0 else raw
 
-    if not (-50.0 <= values["z_down"] < values["z_up"] <= 0.0):
+    if not (cfg["z_min"] <= values["z_down"] < values["z_up"] <= cfg["z_max"]):
         return False, (
-            "pen heights must satisfy -50 <= z_down < z_up <= 0, got "
-            f"z_down={values['z_down']}, z_up={values['z_up']}"
+            "pen heights must satisfy "
+            f"z_min <= z_down < z_up <= z_max, got z_down={values['z_down']}, "
+            f"z_up={values['z_up']} (z_min={cfg['z_min']}, z_max={cfg['z_max']})"
         )
     if any(
         values[key] <= 0.0
@@ -530,11 +547,32 @@ def set_params_tool(req: MCPSetParams_Request) -> MCPSetParams_Response:
     (or a primitive reconnect, which reapplies the cached profile).
 
     velocity is mm/s; acceleration/deceleration are mm/s^2; jerk is mm/s^3.
-    Pen heights must satisfy -50 <= z_down < z_up <= 0 (machine travel);
-    both are usually -46 / -50 (paper surface -50, pen up -46).
+    Pen heights must satisfy z_min <= z_down < z_up <= z_max (the machine's
+    configured travel); both are usually -46 / -50 on this rig.
     """
     success, message = _set_params_impl(req)
     return MCPSetParams_Response(success=success, message=message)
+
+
+# ── geometry ─────────────────────────────────────────────────────
+@xyz_plotter.grpc("robonix/primitive/plotter/geometry")
+def geometry(req, ctx):
+    """Report the static machine geometry from the deployment config.
+
+    Skills call this once on activation. Area and pen heights are config,
+    not feedback: the PLC has no readback.
+    """
+    cfg = _state["cfg"]
+    return plotter_pb2.Geometry_Response(
+        success=True,
+        message="ok",
+        x_min=0.0,
+        x_max=float(cfg["area_x_max"]),
+        y_min=0.0,
+        y_max=float(cfg["area_y_max"]),
+        z_up=float(cfg["z_up"]),
+        z_down=float(cfg["z_down"]),
+    )
 
 
 # ── status stream ────────────────────────────────────────────────────
@@ -572,6 +610,8 @@ def _status_message():
         z=float(z),
         z_up=float(cfg["z_up"]),
         z_down=float(cfg["z_down"]),
+        area_x_max=float(cfg["area_x_max"]),
+        area_y_max=float(cfg["area_y_max"]),
         state=state,
         seq=int(_state["status_seq"]),
     )

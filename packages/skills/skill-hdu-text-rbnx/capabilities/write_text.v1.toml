@@ -1,8 +1,0 @@
-[contract]
-id      = "robonix/skill/text/write_text"
-version = "1"
-kind    = "skill"
-idl     = "plot/srv/WriteText.srv"
-
-[mode]
-type = "rpc"

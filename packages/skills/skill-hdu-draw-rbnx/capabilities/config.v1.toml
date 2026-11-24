@@ -1,8 +1,0 @@
-[contract]
-id      = "robonix/skill/plot/config"
-version = "1"
-kind    = "skill"
-idl     = "plot/srv/Config.srv"
-
-[mode]
-type = "rpc"

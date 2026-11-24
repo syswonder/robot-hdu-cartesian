@@ -1,0 +1,8 @@
+[contract]
+id      = "robonix/primitive/plotter/geometry"
+version = "1"
+kind    = "primitive"
+idl     = "plotter/srv/Geometry.srv"
+
+[mode]
+type = "rpc"

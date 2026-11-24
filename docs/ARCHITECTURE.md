@@ -25,7 +25,7 @@ Pilot / LLM
     │ MCP tool calls
     ├───────────────────────────┐
     ▼                           ▼
-skill-hdu-text-rbnx         skill-hdu-draw-rbnx
+skill-text-rbnx         skill-draw-rbnx
 robonix/skill/text/*        robonix/skill/plot/*
 text → strokes → waypoints  scene / raster / prompt → waypoints
     │                           │
@@ -55,6 +55,7 @@ the discovery plane; Executor activates skills on their first MCP call.
 | `robonix/primitive/plotter/trajectory` | rpc | gRPC |
 | `robonix/primitive/plotter/home` | rpc + MCP | gRPC / MCP `plotter_home` |
 | `robonix/primitive/plotter/set_params` | rpc + MCP | gRPC / MCP `plotter_set_params` |
+| `robonix/primitive/plotter/geometry` | rpc | gRPC |
 | `robonix/primitive/plotter/status` | topic_out | gRPC server stream |
 
 ### Skills
@@ -71,7 +72,7 @@ the discovery plane; Executor activates skills on their first MCP call.
 | `robonix/skill/plot/draw_image` | draw | rpc + MCP |
 | `robonix/skill/plot/list_images` | draw | rpc + MCP |
 
-The skills consume only `trajectory` and `home`. `set_params`, `home`, and
+The skills consume only `trajectory`, `home`, and `geometry`. `set_params`, `home`, and
 `status` are also exposed directly to Pilot/LLM so motion parameters and
 homing are not hidden behind a skill.
 
@@ -129,8 +130,8 @@ the primitive first avoids the activation retry delay.
 
 Details per package:
 [primitive](../packages/primitives/primitive-hdu-cartesian-plotter-rbnx/README.md),
-[text](../packages/skills/skill-hdu-text-rbnx/README.md),
-[draw](../packages/skills/skill-hdu-draw-rbnx/README.md).
+[text](../packages/skills/skill-text-rbnx/README.md),
+[draw](../packages/skills/skill-draw-rbnx/README.md).
 
 ## 6. Data flow
 
@@ -147,6 +148,11 @@ request
   → [auto_home after success]
   → response with plan summary or explicit failure
 ```
+
+Geometry (drawable area, pen heights) is read once on activation through
+`robonix/primitive/plotter/geometry`. `status` is diagnostic only and is never
+used as a geometry source: it is a `topic_out` stream with no consumable
+request/response stub.
 
 Tool-specific transformations:
 
@@ -193,17 +199,17 @@ The wire-level meaning of ACKs, timeouts, and `CLOSE` is defined in
 [PLC_PROTOCOL.md](PLC_PROTOCOL.md).
 
 Drawing tools apply the capability policies in
-[`config.spec`](../packages/skills/skill-hdu-draw-rbnx/config.spec) before
+[`config.spec`](../packages/skills/skill-draw-rbnx/config.spec) before
 entering this execution model. Their order is HOME, then the debug preview, then the trajectory. A
 failed HOME aborts before motion; a preview failure is non-fatal.
 
 ## 8. Codegen and contract mirroring
 
-Skills need gRPC stubs for `Trajectory` and `Home`, but those contracts are
+Skills need gRPC stubs for `Trajectory`, `Home`, and `Geometry`, but those contracts are
 owned by the primitive. Each skill keeps a read-only mirror:
 
 ```text
-skill-hdu-*/capabilities/
+skill-*/capabilities/
 ├── <own>.v1.toml                 # provided, listed in package_manifest.yaml
 ├── lib/...                       # own IDL
 └── primitive/plotter/*.v1.toml   # mirrored, consume-only

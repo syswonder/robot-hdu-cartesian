@@ -1,8 +1,0 @@
-[contract]
-id      = "robonix/skill/plot/draw_image"
-version = "1"
-kind    = "skill"
-idl     = "plot/srv/DrawImage.srv"
-
-[mode]
-type = "rpc"

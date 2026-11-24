@@ -1,9 +1,0 @@
-# Codegen mirror — must match
-# primitive-hdu-cartesian-plotter-rbnx/capabilities/lib/plotter/srv/Home.srv.
-#
-# HOME is parameter-free on the PLC: it returns to machine zero (0,0,0)
-# and ACKs when the homing cycle reports done.
----
-bool    success
-string  message
-float64 elapsed_s

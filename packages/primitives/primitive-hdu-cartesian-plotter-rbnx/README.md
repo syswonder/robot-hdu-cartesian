@@ -19,6 +19,7 @@ call the contracts below over gRPC.
 | `robonix/primitive/plotter/trajectory` | rpc | gRPC | `Trajectory(waypoints)` — one `MOVE_LINEAR` per point, blocks for the ACK |
 | `robonix/primitive/plotter/home` | rpc + MCP | gRPC / MCP | `Home(Empty)` → PLC `MC_GroupHome` (fixed `(0,0,0)`); MCP tool `plotter_home` |
 | `robonix/primitive/plotter/set_params` | rpc + MCP | gRPC / MCP | `SetParams(vel, acc, dec, jerk, z_up, z_down)`; MCP tool `plotter_set_params`; `0` keeps the current value |
+| `robonix/primitive/plotter/geometry` | rpc | gRPC | `Geometry(Empty)` → drawable area + pen heights from config |
 | `robonix/primitive/plotter/status` | topic_out | gRPC stream | `Status(Empty) → stream PlotterStatus` |
 
 `status` is a msg-backed topic. The current PLC firmware has **no STATUS

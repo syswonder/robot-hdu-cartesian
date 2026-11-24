@@ -24,9 +24,9 @@ system:
     vlm:
       # Placeholders only. Fill these in robonix_manifest.local.yaml, which
       # is git-ignored. Never commit or share a real API key.
-      upstream:   ""  # e.g. http://127.0.0.1:8000/v1
-      api_key:    ""  # e.g. deepseek-v4.1-flash
-      model:      ""  # Your API_KEY 
+      upstream:   ""  # e.g. https://api.deepseek.com/v1
+      api_key:    ""  # e.g. sk-xxxxx - never commit a real key
+      model:      ""  # e.g. deepseek-flash
       api_format: openai
   liaison:  { listen: 127.0.0.1:50081, log: info }
 
@@ -37,7 +37,7 @@ system:
 # able to find robonix/primitive/plotter/* at activation time.
 primitive:
   - name: xyz_plotter
-    path: ./packages/primitives/primitive-hdu-cartesian-plotter-rbnx
+    url: https://github.com/MuoTT/primitive-hdu-cartesian-plotter-rbnx.git
     config:
       # MatrixBox MX4001 PLC, TCP server on port 2000 (SDK default).
       host: 192.168.1.135
@@ -50,6 +50,15 @@ primitive:
       # paper's lower-left corner, so the paper surface is z = -50.
       z_up: -46.0
       z_down: -50.0
+      # Z travel limits used for validation. These are machine-specific:
+      # override them to match another rig's physical stroke. The check is
+      # z_min <= z_down < z_up <= z_max.
+      z_min: -50.0
+      z_max: 0.0
+      # Drawable area in the paper frame (origin 0,0 at the paper corner;
+      # x/y minima are always 0). Reported to skills via PlotterStatus.
+      area_x_max: 180.0
+      area_y_max: 150.0
       # Global motion profile (PLC SET_PARAM: 6 x float32).
       velocity: 20.0
       acceleration: 300.0
@@ -61,21 +70,15 @@ primitive:
 # ── Skills: text and drawing, both → primitive ───────────────────────
 # Lazily activated by the executor on the first MCP call. Text writing and
 # drawing are separate packages so their configs and tool surfaces stay
-# small. Both resolve the same plotter primitive and all geometry comes
-# from the repository SDK/ (Hershey + 3755 hanzi strokes, Otsu/marching-
-# squares images).
+# small. Both resolve the same plotter primitive; all geometry (drawable
+# area, pen heights, font/outline code) is vendored in each skill package
+# or read from the primitive's PlotterStatus — nothing comes from a shared
+# SDK.
 skill:
   # Text only: robonix/skill/text/write_text.
   - name: xyz_text
-    path: ./packages/skills/skill-hdu-text-rbnx
+    url: https://github.com/MuoTT/skill-text-rbnx.git
     config:
-      workspace:
-        x_min: 0.0
-        x_max: 180.0
-        y_min: 0.0
-        y_max: 150.0
-        z_up: -46.0
-        z_down: -50.0
       font_size_mm: 10.0
       line_spacing: 1.5
       letter_spacing_mm: 0.5
@@ -97,15 +100,8 @@ skill:
   # directory containing packages/), or under ROBONIX_WORKSPACE when that
   # is set.
   - name: xyz_draw
-    path: ./packages/skills/skill-hdu-draw-rbnx
+    url: https://github.com/MuoTT/skill-draw-rbnx.git
     config:
-      workspace:
-        x_min: 0.0
-        x_max: 180.0
-        y_min: 0.0
-        y_max: 150.0
-        z_up: -46.0
-        z_down: -50.0
       auto_home: true
       # Home before sending a trajectory. plotter_home is still a separate
       # MCP tool; pass skip_home=true when it was already called.
@@ -146,8 +142,9 @@ skill:
       # Join fragments whose endpoints are within this many pixels, so
       # lineart/skeleton strokes stay continuous (0 disables).
       trace_bridge_px: 3.0
-      generate_default_width_mm: 180.0
-      generate_default_height_mm: 150.0
+      # Default canvas size is NOT configured here: it follows the
+      # primitive's drawable area (area_x_max x area_y_max), refreshed on
+      # activation. Omit generate_default_width_mm/height_mm entirely.
       # Millimetres per pixel: 0.25 = 4 px/mm -> 720 x 600 for the paper.
       generate_pixel_to_mm: 0.25
       generate_line_width_mm: 0.5

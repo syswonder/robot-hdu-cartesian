@@ -75,7 +75,6 @@ primitive:
 # or read from the primitive's PlotterStatus — nothing comes from a shared
 # SDK.
 skill:
-  # Text only: robonix/skill/text/write_text.
   - name: xyz_text
     url: https://github.com/syswonder/skill-write_text-rbnx.git
     config:
@@ -83,7 +82,6 @@ skill:
       line_spacing: 1.5
       letter_spacing_mm: 0.5
       origin_x: 5.0
-      # Negative -> SDK default: text block top-aligned at the workspace top.
       origin_y: -1.0
       auto_home: true
       resolve_timeout_s: 60.0
@@ -100,7 +98,7 @@ skill:
   # directory containing packages/), or under ROBONIX_WORKSPACE when that
   # is set.
   - name: xyz_draw
-    url: https://github.com/syswonder/skill-hdu-draw-rbnx.git
+    url: https://github.com/syswonder/skill-draw-rbnx.git
     config:
       auto_home: true
       # Home before sending a trajectory. plotter_home is still a separate

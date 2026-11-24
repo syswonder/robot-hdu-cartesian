@@ -25,7 +25,7 @@ Pilot / LLM
     │ MCP tool calls
     ├───────────────────────────┐
     ▼                           ▼
-skill-text-rbnx         skill-draw-rbnx
+skill-write_text-rbnx       skill-draw-rbnx
 robonix/skill/text/*        robonix/skill/plot/*
 text → strokes → waypoints  scene / raster / prompt → waypoints
     │                           │
@@ -130,7 +130,7 @@ the primitive first avoids the activation retry delay.
 
 Details per package:
 [primitive](../packages/primitives/primitive-hdu-cartesian-plotter-rbnx/README.md),
-[text](../packages/skills/skill-text-rbnx/README.md),
+[text](../packages/skills/skill-write_text-rbnx/README.md),
 [draw](../packages/skills/skill-draw-rbnx/README.md).
 
 ## 6. Data flow

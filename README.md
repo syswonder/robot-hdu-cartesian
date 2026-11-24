@@ -47,14 +47,14 @@ robot-hdu-cartesian/
 └── packages/
     ├── primitives/primitive-hdu-cartesian-plotter-rbnx/   # device layer: PLC/TCP + motion
     └── skills/
-        ├── skill-text-rbnx/                           # text -> waypoints
+        ├── skill-write_text-rbnx/                     # text -> waypoints
         └── skill-draw-rbnx/                           # scene / image / prompt -> waypoints
 ```
 
 | Layer | Package | Contracts | Responsibility |
 | --- | --- | --- | --- |
 | primitive | [`primitive-hdu-cartesian-plotter-rbnx`](packages/primitives/primitive-hdu-cartesian-plotter-rbnx/README.md) | `robonix/primitive/plotter/{driver,trajectory,home,set_params,status,geometry}` | The only package that talks TCP to the PLC; coordinates and motion parameters only |
-| skill | [`skill-text-rbnx`](packages/skills/skill-text-rbnx/README.md) | `robonix/skill/text/{driver,write_text}` | Turns Chinese/English text into pen strokes |
+| skill | [`skill-write_text-rbnx`](packages/skills/skill-write_text-rbnx/README.md) | `robonix/skill/text/{driver,write_text}` | Turns Chinese/English text into pen strokes |
 | skill | [`skill-draw-rbnx`](packages/skills/skill-draw-rbnx/README.md) | `robonix/skill/plot/{driver,config,draw_scene,draw_prompt,render_preview,draw_image,list_images}` | Declarative scenes, prompt-to-image, debug previews, and traced images |
 
 Text and drawing share the same primitive but have disjoint configuration and
@@ -138,7 +138,7 @@ Unit tests do not need Robonix, the PLC, or an image service:
 ```bash
 uv run pytest \
   packages/primitives/primitive-hdu-cartesian-plotter-rbnx/tests \
-  packages/skills/skill-text-rbnx/tests \
+  packages/skills/skill-write_text-rbnx/tests \
   packages/skills/skill-draw-rbnx/tests -q
 ```
 

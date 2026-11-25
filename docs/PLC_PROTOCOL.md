@@ -5,8 +5,8 @@
 > Robonix-side summary used to review the primitive implementation; field-level
 > PLC state machines and packet captures remain in the SDK documentation.
 >
-> Implementations: [`protocol.py`](../packages/primitives/primitive-hdu-cartesian-plotter-rbnx/robonix_sdk/protocol.py)
-> and [`client.py`](../packages/primitives/primitive-hdu-cartesian-plotter-rbnx/robonix_sdk/client.py).
+> Implementations: [`protocol.py`](../packages/primitives/primitive-hdu-cartesian-plotter-rbnx/xyz_plotter/sdk/protocol.py)
+> and [`client.py`](../packages/primitives/primitive-hdu-cartesian-plotter-rbnx/xyz_plotter/sdk/client.py).
 
 ## 1. Transport
 

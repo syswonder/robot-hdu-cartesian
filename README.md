@@ -79,10 +79,7 @@ uv sync --locked
 
 Commit `uv.lock` after dependency changes; `.venv/` stays local.
 
-`numpy` and `Pillow` are required because the SDK package's `__init__`
-imports the image pipeline even for text-only work. The Robonix Python
-runtime itself (`robonix_api`, `grpcio`, `fastmcp`) is pinned in
-[`pyproject.toml`](pyproject.toml) and is still injected at process start via
+The Robonix Python runtime itself (`robonix_api`, `grpcio`, `fastmcp`) is pinned in [`pyproject.toml`](pyproject.toml) and is still injected at process start via
 `rbnx path robonix-api`.
 
 Copy the deployment manifest to the git-ignored local file and fill in the

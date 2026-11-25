@@ -40,7 +40,6 @@ robot-hdu-cartesian/
 ├── uv.lock
 ├── .python-version
 ├── scripts/uv_sync.sh             # serialized uv sync used by package builds
-├── (PLC protocol + geometry are vendored per package; no shared SDK/)
 ├── docs/
 │   ├── ARCHITECTURE.md
 │   └── PLC_PROTOCOL.md
@@ -55,7 +54,7 @@ robot-hdu-cartesian/
 | --- | --- | --- | --- |
 | primitive | [`primitive-hdu-cartesian-plotter-rbnx`](packages/primitives/primitive-hdu-cartesian-plotter-rbnx/README.md) | `robonix/primitive/plotter/{driver,trajectory,home,set_params,status,geometry}` | The only package that talks TCP to the PLC; coordinates and motion parameters only |
 | skill | [`skill-write_text-rbnx`](packages/skills/skill-write_text-rbnx/README.md) | `robonix/skill/write_text/{driver,write}` | Turns Chinese/English text into pen strokes |
-| skill | [`skill-draw-rbnx`](packages/skills/skill-draw-rbnx/README.md) | `robonix/skill/plot/{driver,config,draw_scene,draw_prompt,render_preview,draw_image,list_images}` | Declarative scenes, prompt-to-image, debug previews, and traced images |
+| skill | [`skill-draw-rbnx`](packages/skills/skill-draw-rbnx/README.md) | `robonix/skill/draw/{driver,config,scene,prompt,render_preview,image,list_images}` | Declarative scenes, prompt-to-image, debug previews, and traced images |
 
 Text and drawing share the same primitive but have disjoint configuration and
 tool surfaces. Keeping them in separate packages keeps each `config.spec`
@@ -114,7 +113,7 @@ nc -z 192.168.1.135 2000 && echo "PLC TCP reachable"
 ```bash
 rbnx build
 rbnx boot -f robonix_manifest.local.yaml
-rbnx caps | grep -E 'primitive/plotter|skill/write_text|skill/plot'
+rbnx caps | grep -E 'primitive/plotter|skill/write_text|skill/draw'
 rbnx chat
 ```
 
@@ -175,18 +174,18 @@ Bring-up order:
 
 ## Drawing policy
 
-The Pilot/LLM calls `robonix/skill/plot/config` before planning a drawing
+The Pilot/LLM calls `robonix/skill/draw/config` before planning a drawing
 request. The returned flags (`debug`, `imagegen_ready`, `home_before_draw`,
 `preview_name`) select one of two paths:
 
 | Request | Path |
 | --- | --- |
-| Structured/geometric (shapes, coordinates, JSON) | `plotter_home` → `render_preview` (only when `debug=true`) → `draw_scene` |
-| Free-form/illustrative and `imagegen_ready=true` | `plotter_home` → `draw_prompt`; on failure, author a simple scene and use `draw_scene` |
+| Structured/geometric (shapes, coordinates, JSON) | `plotter_home` → `render_preview` (only when `debug=true`) → `scene` |
+| Free-form/illustrative and `imagegen_ready=true` | `plotter_home` → `prompt`; on failure, author a simple scene and use `scene` |
 
 The skill enforces the same behavior even if the planner omits a step:
-`draw_scene`/`draw_image`/`draw_prompt` home before the trajectory when
-`home_before_draw: true`, and a non-dry-run `draw_scene` writes
+`scene`/`image`/`prompt` home before the trajectory when
+`home_before_draw: true`, and a non-dry-run `scene` writes
 `output_dir/last_preview.png` before moving when `debug: true`. Passing
 `skip_home=true` / `skip_preview=true` prevents duplicate work after the
 planner has already performed that step. Preview failures are warnings and

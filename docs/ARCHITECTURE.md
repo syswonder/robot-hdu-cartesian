@@ -26,7 +26,7 @@ Pilot / LLM
     ├───────────────────────────┐
     ▼                           ▼
 skill-write_text-rbnx       skill-draw-rbnx
-robonix/skill/write_text/*  robonix/skill/plot/*
+robonix/skill/write_text/*  robonix/skill/draw/*
 text → strokes → waypoints  scene / raster / prompt → waypoints
     │                           │
     └─────────────┬─────────────┘
@@ -64,13 +64,13 @@ the discovery plane; Executor activates skills on their first MCP call.
 | --- | --- | --- |
 | `robonix/skill/write_text/driver` | write_text | rpc |
 | `robonix/skill/write_text/write` | write_text | rpc + MCP |
-| `robonix/skill/plot/driver` | draw | rpc |
-| `robonix/skill/plot/config` | draw | rpc + MCP |
-| `robonix/skill/plot/draw_scene` | draw | rpc + MCP |
-| `robonix/skill/plot/draw_prompt` | draw | rpc + MCP |
-| `robonix/skill/plot/render_preview` | draw | rpc + MCP |
-| `robonix/skill/plot/draw_image` | draw | rpc + MCP |
-| `robonix/skill/plot/list_images` | draw | rpc + MCP |
+| `robonix/skill/draw/driver` | draw | rpc |
+| `robonix/skill/draw/config` | draw | rpc + MCP |
+| `robonix/skill/draw/scene` | draw | rpc + MCP |
+| `robonix/skill/draw/prompt` | draw | rpc + MCP |
+| `robonix/skill/draw/render_preview` | draw | rpc + MCP |
+| `robonix/skill/draw/image` | draw | rpc + MCP |
+| `robonix/skill/draw/list_images` | draw | rpc + MCP |
 
 The skills consume only `trajectory`, `home`, and `geometry` (resolved on
 activation). `set_params`, `home`, and
@@ -160,24 +160,24 @@ Tool-specific transformations:
 | Tool | Transformation | Motion |
 | --- | --- | --- |
 | `write_text_write` | Text → vendored single-stroke glyphs → scaled, spaced, wrapped polylines | Yes, unless `dry_run` |
-| `draw_scene` | JSON scene → analytic polylines; no rasterisation | Yes, unless `dry_run` |
+| `scene` | JSON scene → analytic polylines; no rasterisation | Yes, unless `dry_run` |
 | `render_preview` | JSON scene → supersampled monochrome PNG with orientation metadata | No |
-| `draw_prompt` | Prompt → external image service → PNG → trace → polylines | Yes, unless `dry_run` |
-| `draw_image` | Raster → threshold/edge extraction → trace → polylines | Yes, unless `dry_run` |
+| `prompt` | Prompt → external image service → PNG → trace → polylines | Yes, unless `dry_run` |
+| `image` | Raster → threshold/edge extraction → trace → polylines | Yes, unless `dry_run` |
 | `list_images` | Enumerate allowed files under the read roots | No |
-| `plot_config` | Return runtime policy flags | No |
+| `config` | Return runtime policy flags | No |
 | `plotter_home` | PLC homing routine to `(0,0,0)` | Yes |
 | `plotter_set_params` | Update the global motion profile | No |
 
 `dry_run` performs every validation and planning step but sends no
-trajectory and never homes or previews. `draw_prompt` with `dry_run=true`
+trajectory and never homes or previews. `prompt` with `dry_run=true`
 still generates and writes its PNG, because image generation precedes
-planning. `render_preview`, `list_images`, and `plot_config` are
+planning. `render_preview`, `list_images`, and `config` are
 side-effect-free with respect to motion.
 
-The `draw_prompt` failure path is a planner decision, not an automatic
+The `prompt` failure path is a planner decision, not an automatic
 fallback: the tool returns `success=false`, and Pilot may author a simple
-declarative scene and call `draw_scene` next.
+declarative scene and call `scene` next.
 
 ## 7. Execution semantics
 
@@ -244,10 +244,10 @@ codegen stubs import against compatible versions.
 | HOME fails before a draw | Job aborts with `success=false`; no trajectory is sent |
 | Preview render fails (`debug: true`) | Warning in `message`; drawing continues |
 | Workspace or pen-height violation | Skill rejects the plan; no motion |
-| Path outside `image_dir` / `output_dir` | `draw_image` / `list_images` reject before reading |
-| Invalid or oversized JSON scene | `draw_scene` / `render_preview` reject the whole request |
-| Raster produces no drawable strokes | `draw_image` fails with a hint to change `trace` or `invert` |
-| Image generation unavailable or invalid | `draw_prompt` returns `success=false`; generated files, if any, remain in `output_dir` |
+| Path outside `image_dir` / `output_dir` | `image` / `list_images` reject before reading |
+| Invalid or oversized JSON scene | `scene` / `render_preview` reject the whole request |
+| Raster produces no drawable strokes | `image` fails with a hint to change `trace` or `invert` |
+| Image generation unavailable or invalid | `prompt` returns `success=false`; generated files, if any, remain in `output_dir` |
 | Plan exceeds `max_points` | Rejected during planning; no partial trajectory |
 | Concurrent job | Second job receives a busy error; nothing is queued |
 | Emergency stop or mid-job failure | No software abort; the pen remains where it stopped and must be homed before retry |

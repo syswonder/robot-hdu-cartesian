@@ -23,14 +23,14 @@ robot:
     - provider_id: write_text
       capabilities:
         - { path: robonix/skill/write_text/write, description: "Write Chinese/English text as pen strokes." }
-    - provider_id: xyz_draw
+    - provider_id: draw
       capabilities:
-        - { path: robonix/skill/plot/config, description: "Read draw policy flags (debug, imagegen_ready) before planning; no motion, no files." }
-        - { path: robonix/skill/plot/draw_scene, description: "Structured/geometric requests. Homes first; writes last_preview.png when debug=true." }
-        - { path: robonix/skill/plot/draw_prompt, description: "Preferred for free-form drawing when imagegen_ready=true; fall back to draw_scene on failure." }
-        - { path: robonix/skill/plot/render_preview, description: "Call before draw_scene when debug=true; writes output_dir/last_preview.png." }
-        - { path: robonix/skill/plot/draw_image, description: "Trace an image from image_dir/output_dir and draw it; homes first." }
-        - { path: robonix/skill/plot/list_images, description: "List images that draw_image is allowed to read." }
+        - { path: robonix/skill/draw/config, description: "Read draw policy flags (debug, imagegen_ready) before planning; no motion, no files." }
+        - { path: robonix/skill/draw/scene, description: "Structured/geometric requests. Homes first; writes last_preview.png when debug=true." }
+        - { path: robonix/skill/draw/prompt, description: "Preferred for free-form drawing when imagegen_ready=true; fall back to scene on failure." }
+        - { path: robonix/skill/draw/render_preview, description: "Call before scene when debug=true; writes output_dir/last_preview.png." }
+        - { path: robonix/skill/draw/image, description: "Trace an image from image_dir/output_dir and draw it; homes first." }
+        - { path: robonix/skill/draw/list_images, description: "List images that the image tool is allowed to read." }
   components:
     - id: gantry
       type: cartesian_gantry
@@ -51,12 +51,12 @@ robot:
         - provider_id: write_text
           capabilities:
             - { path: robonix/skill/write_text/write, description: "Text is rendered by the pen tip." }
-        - provider_id: xyz_draw
+        - provider_id: draw
           capabilities:
-            - { path: robonix/skill/plot/draw_scene, description: "Directly plotted scene strokes are rendered by the pen tip; previews when debug=true." }
-            - { path: robonix/skill/plot/draw_prompt, description: "Prompt-generated images are traced and rendered by the pen tip; preferred for free-form drawing." }
-            - { path: robonix/skill/plot/render_preview, description: "Writes output_dir/last_preview.png; call before draw_scene when debug=true." }
-            - { path: robonix/skill/plot/draw_image, description: "Image traces are rendered by the pen tip." }
+            - { path: robonix/skill/draw/scene, description: "Directly plotted scene strokes are rendered by the pen tip; previews when debug=true." }
+            - { path: robonix/skill/draw/prompt, description: "Prompt-generated images are traced and rendered by the pen tip; preferred for free-form drawing." }
+            - { path: robonix/skill/draw/render_preview, description: "Writes output_dir/last_preview.png; call before scene when debug=true." }
+            - { path: robonix/skill/draw/image, description: "Image traces are rendered by the pen tip." }
 
 description:
   summary: >
@@ -73,9 +73,9 @@ description:
     - 只从配置的 image_dir/output_dir 读取图片，并且只把 debug 预览写入 output_dir，避免污染仓库或系统目录。
     - 把 PNG/JPEG/BMP/WebP 图片二值化，按 outline/skeleton/lineart 模式追踪轮廓或骨架，简化后等比适配纸张并绘制，支持反转、镜像与显式缩放。
     - 识别 render_preview 写入的方向/比例元数据，把预览图按屏幕方向、1:1 毫米比例绘制。
-    - debug=true 时启用 render_preview，且 draw_scene 在下笔前自动写 last_preview.png；debug=false 时不写预览，预览失败只告警。
+    - debug=true 时启用 render_preview，且 scene 在下笔前自动写 last_preview.png；debug=false 时不写预览，预览失败只告警。
     - 绘制前默认先回零（home_before_draw）；plotter_home 仍是独立工具，已调用时传 skip_home 避免重复。
-    - 自由描述/插画在 imagegen_ready=true 时优先 draw_prompt，失败后用 draw_scene 画简化场景。
+    - 自由描述/插画在 imagegen_ready=true 时优先 prompt，失败后用 scene 画简化场景。
     - 列出可绘制图片（可按文件名过滤），接收任意 (x, y, z) 航点序列，供签名或自定义路径复用。
     - 通过 SET_PARAM 设置全局速度、加速度、减速度、jerk 与抬笔/落笔高度。
     - 执行回零（home，固定回 (0,0,0)），并上报连接状态、忙闲、当前坐标与最近错误。

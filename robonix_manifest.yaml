@@ -89,16 +89,16 @@ skill:
       max_points: 50000
       trajectory_timeout_s: 600.0
 
-  # Drawing only: draw_scene / render_preview / draw_image / list_images.
+  # Drawing only: scene / render_preview / image / list_images.
   # image_dir is the only read root (plus output_dir); output_dir is the
   # write root. debug enables render_preview; actual drawing always uses
-  # draw_scene or draw_image.
+  # scene or image.
   # Speed/acceleration/pen heights are primitive-level: set them with
   # plotter_set_params (or plotter_home for homing), not in this config.
   # Relative paths resolve to images/ under the deployment root (the
   # directory containing packages/), or under ROBONIX_WORKSPACE when that
   # is set.
-  - name: xyz_draw
+  - name: draw
     url: https://github.com/syswonder/skill-draw-rbnx.git
     config:
       auto_home: true
@@ -107,14 +107,14 @@ skill:
       home_before_draw: true
       image_dir: images
       # Empty -> same as image_dir. Generated files are always readable
-      # by draw_image, whether or not the two directories differ.
+      # by the image tool, whether or not the two directories differ.
       output_dir: ""
-      # If true, render_preview is enabled and draw_scene writes
+      # If true, render_preview is enabled and scene writes
       # output_dir/last_preview.png before moving (skip_preview=true skips
       # it). Preview failures warn but never block drawing. If false, no
       # preview is written.
-      debug: true
-      # Text-to-image for draw_prompt. Set enabled=true and fill base_url,
+      debug: false
+      # Text-to-image for prompt. Set enabled=true and fill base_url,
       # model and api_key to turn "draw a cat" into imagegen -> lineart.
       # The service must speak the OpenAI /images/generations API.
       imagegen_enabled: false
@@ -131,7 +131,7 @@ skill:
       simplify_px: 1.5
       image_margin_mm: 5.0
       image_fill: 0.8
-      # draw_image tracing. auto = skeleton for preview PNGs, outline
+      # image tracing. auto = skeleton for preview PNGs, outline
       # otherwise; use lineart for photos and grey artwork.
       trace: auto
       trace_lineart_sigma: 1.2

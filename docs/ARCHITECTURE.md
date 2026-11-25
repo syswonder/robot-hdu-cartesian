@@ -26,11 +26,11 @@ Pilot / LLM
     ├───────────────────────────┐
     ▼                           ▼
 skill-write_text-rbnx       skill-draw-rbnx
-robonix/skill/text/*        robonix/skill/plot/*
+robonix/skill/write_text/*  robonix/skill/plot/*
 text → strokes → waypoints  scene / raster / prompt → waypoints
     │                           │
     └─────────────┬─────────────┘
-                  │ gRPC: trajectory, home
+                  │ gRPC: trajectory, home, geometry
                   ▼
 primitive-hdu-cartesian-plotter-rbnx
 robonix/primitive/plotter/*
@@ -62,8 +62,8 @@ the discovery plane; Executor activates skills on their first MCP call.
 
 | Contract | Provider | Mode |
 | --- | --- | --- |
-| `robonix/skill/text/driver` | text | rpc |
-| `robonix/skill/text/write_text` | text | rpc + MCP |
+| `robonix/skill/write_text/driver` | write_text | rpc |
+| `robonix/skill/write_text/write` | write_text | rpc + MCP |
 | `robonix/skill/plot/driver` | draw | rpc |
 | `robonix/skill/plot/config` | draw | rpc + MCP |
 | `robonix/skill/plot/draw_scene` | draw | rpc + MCP |
@@ -72,7 +72,8 @@ the discovery plane; Executor activates skills on their first MCP call.
 | `robonix/skill/plot/draw_image` | draw | rpc + MCP |
 | `robonix/skill/plot/list_images` | draw | rpc + MCP |
 
-The skills consume only `trajectory`, `home`, and `geometry`. `set_params`, `home`, and
+The skills consume only `trajectory`, `home`, and `geometry` (resolved on
+activation). `set_params`, `home`, and
 `status` are also exposed directly to Pilot/LLM so motion parameters and
 homing are not hidden behind a skill.
 
@@ -101,9 +102,9 @@ prevent fields such as `font_size_mm` from leaking into the drawing surface.
 ### Why the primitive is declared first
 
 `rbnx boot` starts packages in manifest order and performs no retry of the
-whole stack. Skills resolve `trajectory` and `home` when they are first
-activated, so the primitive must already be registered in Atlas. Declaring
-the primitive first avoids the activation retry delay.
+whole stack. Skills resolve `trajectory`, `home`, and `geometry` when they
+are first activated, so the primitive must already be registered in Atlas.
+Declaring the primitive first avoids the activation retry delay.
 
 ## 5. Runtime lifecycle
 
@@ -123,14 +124,14 @@ the primitive first avoids the activation retry delay.
 - `CMD_INIT`: parse config and validate directories. No upstream discovery
   and no PLC connection.
 - `CMD_ACTIVATE`: triggered by Executor on the first MCP call. Resolve
-  `trajectory` and `home` through Atlas. Missing endpoints return `Deferred`;
-  the next MCP call retries.
+  `trajectory`, `home`, and `geometry` through Atlas, then read the workspace
+  once. Missing endpoints return `Deferred`; the next MCP call retries.
 - Tool calls are synchronous: they return only after the primitive responds
   or the configured timeout expires.
 
 Details per package:
 [primitive](../packages/primitives/primitive-hdu-cartesian-plotter-rbnx/README.md),
-[text](../packages/skills/skill-write_text-rbnx/README.md),
+[write_text](../packages/skills/skill-write_text-rbnx/README.md),
 [draw](../packages/skills/skill-draw-rbnx/README.md).
 
 ## 6. Data flow
@@ -158,7 +159,7 @@ Tool-specific transformations:
 
 | Tool | Transformation | Motion |
 | --- | --- | --- |
-| `write_text` | Text → SDK single-stroke glyphs → scaled, spaced, wrapped polylines | Yes, unless `dry_run` |
+| `write_text_write` | Text → vendored single-stroke glyphs → scaled, spaced, wrapped polylines | Yes, unless `dry_run` |
 | `draw_scene` | JSON scene → analytic polylines; no rasterisation | Yes, unless `dry_run` |
 | `render_preview` | JSON scene → supersampled monochrome PNG with orientation metadata | No |
 | `draw_prompt` | Prompt → external image service → PNG → trace → polylines | Yes, unless `dry_run` |

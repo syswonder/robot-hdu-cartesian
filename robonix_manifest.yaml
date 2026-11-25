@@ -56,7 +56,8 @@ primitive:
       z_min: -50.0
       z_max: 0.0
       # Drawable area in the paper frame (origin 0,0 at the paper corner;
-      # x/y minima are always 0). Reported to skills via PlotterStatus.
+      # x/y minima are always 0). Reported to skills via the geometry
+      # contract.
       area_x_max: 180.0
       area_y_max: 150.0
       # Global motion profile (PLC SET_PARAM: 6 x float32).
@@ -72,10 +73,10 @@ primitive:
 # drawing are separate packages so their configs and tool surfaces stay
 # small. Both resolve the same plotter primitive; all geometry (drawable
 # area, pen heights, font/outline code) is vendored in each skill package
-# or read from the primitive's PlotterStatus — nothing comes from a shared
-# SDK.
+# or read from the primitive's geometry contract — nothing comes from a
+# shared SDK.
 skill:
-  - name: xyz_text
+  - name: write_text
     url: https://github.com/syswonder/skill-write_text-rbnx.git
     config:
       font_size_mm: 10.0

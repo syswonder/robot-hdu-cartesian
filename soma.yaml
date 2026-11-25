@@ -20,9 +20,9 @@ robot:
       - [-0.18, -0.18]
       - [-0.18, 0.18]
   exports:
-    - provider_id: xyz_text
+    - provider_id: write_text
       capabilities:
-        - { path: robonix/skill/text/write_text, description: "Write Chinese/English text as pen strokes." }
+        - { path: robonix/skill/write_text/write, description: "Write Chinese/English text as pen strokes." }
     - provider_id: xyz_draw
       capabilities:
         - { path: robonix/skill/plot/config, description: "Read draw policy flags (debug, imagegen_ready) before planning; no motion, no files." }
@@ -48,9 +48,9 @@ robot:
       type: end_effector
       urdf_link: z_carriage
       exports:
-        - provider_id: xyz_text
+        - provider_id: write_text
           capabilities:
-            - { path: robonix/skill/text/write_text, description: "Text is rendered by the pen tip." }
+            - { path: robonix/skill/write_text/write, description: "Text is rendered by the pen tip." }
         - provider_id: xyz_draw
           capabilities:
             - { path: robonix/skill/plot/draw_scene, description: "Directly plotted scene strokes are rendered by the pen tip; previews when debug=true." }
@@ -83,7 +83,7 @@ description:
     - 不能移动底座或自主导航（无底盘、无轮子）。
     - 不能感知环境、避障或识别物体（无相机、无雷达）。
     - 不能书写标点符号或字库外的汉字；单笔画字体只覆盖 ASCII 字母数字和 3755 个一级汉字。
-    - 绘图只支持线稿，不支持填充、颜色、渐变或文字；文字必须交给 text skill。
+    - 绘图只支持线稿，不支持填充、颜色、渐变或文字；文字必须交给 write_text skill。
     - 不能自动换笔、换色、控制下笔压力或检测墨水余量。
     - 不能力控/柔顺控制；Z 轴只有抬笔与落笔两个离散高度。
     - 协议没有 STOP：任务中途失败时笔会停在原地，只能再次 home。

@@ -54,7 +54,7 @@ robot-hdu-cartesian/
 | Layer | Package | Contracts | Responsibility |
 | --- | --- | --- | --- |
 | primitive | [`primitive-hdu-cartesian-plotter-rbnx`](packages/primitives/primitive-hdu-cartesian-plotter-rbnx/README.md) | `robonix/primitive/plotter/{driver,trajectory,home,set_params,status,geometry}` | The only package that talks TCP to the PLC; coordinates and motion parameters only |
-| skill | [`skill-write_text-rbnx`](packages/skills/skill-write_text-rbnx/README.md) | `robonix/skill/text/{driver,write_text}` | Turns Chinese/English text into pen strokes |
+| skill | [`skill-write_text-rbnx`](packages/skills/skill-write_text-rbnx/README.md) | `robonix/skill/write_text/{driver,write}` | Turns Chinese/English text into pen strokes |
 | skill | [`skill-draw-rbnx`](packages/skills/skill-draw-rbnx/README.md) | `robonix/skill/plot/{driver,config,draw_scene,draw_prompt,render_preview,draw_image,list_images}` | Declarative scenes, prompt-to-image, debug previews, and traced images |
 
 Text and drawing share the same primitive but have disjoint configuration and
@@ -114,7 +114,7 @@ nc -z 192.168.1.135 2000 && echo "PLC TCP reachable"
 ```bash
 rbnx build
 rbnx boot -f robonix_manifest.local.yaml
-rbnx caps | grep -E 'primitive/plotter|skill/text|skill/plot'
+rbnx caps | grep -E 'primitive/plotter|skill/write_text|skill/plot'
 rbnx chat
 ```
 
@@ -203,7 +203,8 @@ and data flow.
 The robot cannot move its base, navigate, sense the environment, avoid
 obstacles, change pens or colours, control pen pressure, or verify drawing
 quality. Text is limited to ASCII letters/digits and the 3755 GB2312
-level-1 hanzi in the SDK font; punctuation is not supported.
+level-1 hanzi in the vendored single-stroke font; punctuation is not
+supported.
 
 ## License
 

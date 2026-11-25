@@ -36,7 +36,7 @@ robot:
       type: cartesian_gantry
       urdf_link: base_link
       exports:
-        - provider_id: xyz_plotter
+        - provider_id: cartesian_plotter
           capabilities:
             - { path: robonix/primitive/plotter/driver, description: "Lifecycle + PLC connection." }
             - { path: robonix/primitive/plotter/trajectory, description: "Execute a list of (x,y,z) waypoints." }

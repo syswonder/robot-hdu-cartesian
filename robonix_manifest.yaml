@@ -36,7 +36,7 @@ system:
 # Declared first: rbnx boot has no defer/retry, so the skill must be
 # able to find robonix/primitive/plotter/* at activation time.
 primitive:
-  - name: xyz_plotter
+  - name: cartesian_plotter
     url: https://github.com/syswonder/primitive-hdu-cartesian-plotter-rbnx.git
     config:
       # MatrixBox MX4001 PLC, TCP server on port 2000 (SDK default).
